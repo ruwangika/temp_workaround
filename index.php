@@ -36,7 +36,9 @@
 <script src="js/gridstack.js"></script>
 <script src="js/canvasjs.min.js"></script>
 <script src="js/gridstack.jQueryUI.js"></script>
-<script src="js/piechart.jl.js"></script>
+<script src="js/linechart-light.jl.js"></script>
+<script src="js/columnchart-light.jl.js"></script>
+<script src="js/piechart-light.jl.js"></script>
 <script src="js/equations.jl.js"></script>
 <script src="js/common.jl.js"></script>
 <script src="js/epoch.js"></script>
@@ -62,34 +64,40 @@
             </div>
             <div class="w3-row w3-padding-8 widget-color">
                 <div class="w3-col w3-container" style="width:20%">
-                    <input type="text" id="prefixEquationText" placeholder="Equation prefix here." onkeyup="updateEquationText()" >
+                    <input type="text" id="prefixEquationText" placeholder="Equation prefix here."" >
                 </div>
                 <div class="w3-col w3-container" style="width:10%">
                     <p class="label-1">Device</p>
                 </div>
                 <div class="w3-col w3-container" style="width:20%">
-                    <select id="deviceCombo" class="combo-1" onchange="updateEquationText()"></select>
+                    <select id="deviceCombo" class="combo-1"></select>
                 </div>
                 <div class="w3-col w3-container" style="width:10%">
                     <p class="label-1">Channel</p>
                 </div>
                 <div class="w3-col w3-container" style="width:20%">
-                    <select id="channelCombo" class="combo-1" onchange="updateEquationText()"></select>
+                    <select id="channelCombo" class="combo-1"></select>
                 </div>
-                <div class="w3-col w3-container" style="width:20%">
-                   <input type="text" id="equationUnitText" placeholder="Unit" onkeyup="updateEquationText()" >
+                <div class="w3-col w3-container" style="width:10%">
+                   <input type="text" size="6" id="equationUnitText" placeholder="Unit">
+                </div>
+                <div class="w3-col w3-container" style="width:10%">
+                   <p><button class="portal-pane-button" onclick="addExpression()" style="font-size:12px">Add Expression</button></p>
                 </div>
 
             </div>
 
             <div class="w3-row w3-padding-8 widget-color">
-                <div class="w3-col w3-container" style="width:70%">
+                <div class="w3-col w3-container" style="width:80%">
                     <p id="equationText"></p>
-                    
                 </div>
-                <div class="w3-col w3-container w3-right" style="width:30%">
-                <p><button class="portal-pane-button" onclick="addEquation()" style="font-size:22px">Add Equation</button></p>
+                <div class="w3-col w3-container w3-right" style="width:10%">
+                    <p><button class="portal-pane-button" onclick="addEquation()" style="font-size:14px">Add Equation</button></p>
                 </div>
+                <div class="w3-col w3-container w3-right" style="width:10%">
+                    <p><button class="portal-pane-button" onclick="clearExpressions()" style="font-size:12px">Clear Expressions</button></p>
+                </div>
+
             </div>
                     
             <div class="w3-container">
@@ -438,6 +446,7 @@
         var gaugeIndex = 0;
         var indicatorIndex = 0; 
         var globalEqList = [];
+        var tempExpressionsList=[];
         var gauges = [];
         var tempGraph;
         var tempParent;

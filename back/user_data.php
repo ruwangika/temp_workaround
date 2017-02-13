@@ -17,7 +17,7 @@
         echo json_encode(getEquations($userID));
     }
     else if($type == 'save_grid'){
-        
+
         $grid = $_POST["grid"];
         $userID = $_POST["userID"];
         $theme = $_POST["theme"];

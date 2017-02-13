@@ -39,7 +39,7 @@
 			}
 			 
 		}
-		return [];		
+		return [];
 	}
 
 	function loadTheme($userID){
