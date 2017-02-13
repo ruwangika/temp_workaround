@@ -49,25 +49,15 @@ function getStartDate(days){
     return year + '-' + month + '-' + day;
 }
 
-var theme = document.getElementById("themeCombo");
-var bgcolor = "";
-var fcolor ="";
-if (theme="dark") {
-    bgcolor = "#2A2A2A";
-    fcolor = "lightgray";
-} else if (theme="light"){
-    bgcolor = "white";
-    fcolor = "#0d1a26";
-}
 // This function renders a line chart:something vs date
-function initLineChart(chartID,title,chartData) {
+function initLineChart(chartID,title, chartData) {
     lineChart = new CanvasJS.Chart(chartID, {
         zoomEnabled: true,
-        backgroundColor: bgcolor,
-        theme: "theme2",
+        backgroundColor: "white",
+        theme: "theme1",
         title: {
             text: title,
-            fontColor: fcolor,
+            fontColor: "#0d1a26",
             fontStyle: "normal",
             fontWeight: "lighter",
             fontFamily: "calibri",
@@ -75,7 +65,7 @@ function initLineChart(chartID,title,chartData) {
         },
         legend: {
             cursor: "pointer",
-            fontColor: "lightgray",
+            fontColor: "#333333",
             itemclick: function(e) {
                 if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
                     e.dataSeries.visible = false;

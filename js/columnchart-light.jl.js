@@ -5,12 +5,12 @@ function initBarChart(chartID,title, chartData,axisX) {
 
     var colChart = new CanvasJS.Chart(chartID,
         {
-            theme: "theme3",
-            backgroundColor: "#2A2A2A",
+            theme: "theme1",
+            backgroundColor: "white",
             animationEnabled: true,
             title:{
                 text: title,
-                fontColor: "lightgray",
+                fontColor: "#0d1a26",
                 fontStyle: "normal",
                 fontWeight: "lighter",
                 fontFamily: "calibri",
@@ -25,7 +25,7 @@ function initBarChart(chartID,title, chartData,axisX) {
             data: chartData,
           legend:{
             cursor:"pointer",
-            fontColor: "lightgray",
+            fontColor: "#333333",
             itemclick: function(e){
               if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
                 e.dataSeries.visible = false;

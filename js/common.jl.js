@@ -17,7 +17,7 @@ function loadDevicesCombo() {
                     text: data.DeviceId[j]
                 }));
             }
-            //updateEquationText();
+            updateEquationText();
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) {
             console.log(XMLHttpRequest);
@@ -54,7 +54,7 @@ function loadChannelCombo() {
                     text: channel
                 }));
             }
-            //updateEquationText();
+            updateEquationText();
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) {
             console.log(XMLHttpRequest);
@@ -74,7 +74,7 @@ function loadPieChartTotalCombo() {
     }));
     for (j = 0; j < _len; j++) {
 
-        if ((parseEquation(globalEqList[j])).includes("energy")) {
+        if ((globalEqList[j].channel).includes("energy")) {
             var eq = globalEqList[j];
             var eqStr = parseEquation(eq);
             totalCombo.append($('<option/>', {
@@ -209,7 +209,7 @@ function graphFilterYear() {
 
 function loadChartData(type, chartID, data,period) {
     if (type == "lineChart") {
-        loadlineChartData(chartID, data.title, data.equationList, data.xAxis, data.startDate, data.endDate, data.interval, data.type);
+        loadlineChartData(chartID, data.title, data.devices, data.channels, data.units, data.xAxis, data.startDate, data.endDate, data.interval, data.type);
     } else if (type == "colChart") {
         var accInt = "DAY";
         if(period == "day"){
@@ -221,9 +221,9 @@ function loadChartData(type, chartID, data,period) {
         }else if(period == "year"){
             accInt = "MONTH";
         }
-        loadBarChartData(chartID, data.title, data.equationList, data.xAxis, data.startDate, data.endDate, accInt, data.tarrifs, data.type)
+        loadBarChartData(chartID, data.title, data.devices, data.channels, data.units, data.xAxis, data.startDate, data.endDate, accInt, data.tarrifs, data.type)
     } else if (type == "pieChart") {
-        loadPieChartData(chartID, data.title, data.equationList, data.total, data.startDate, data.endDate, data.dataType, data.type);
+        loadPieChartData(chartID, data.title, data.devices, data.total, data.channel, data.units, data.startDate, data.endDate, data.dataType, data.type);
     }
 }
 
@@ -268,6 +268,15 @@ function graphnav_close() {
     document.getElementById("graphnav").style.display = "none";
 }
 
+function updateEquationText() {
+    var device = document.getElementById("deviceCombo").value;
+    var channel = document.getElementById("channelCombo").value;
+    var prefix = document.getElementById("prefixEquationText").value;
+    if (prefix == "") {
+        prefix = "1*";
+    }
+    document.getElementById("equationText").innerHTML = prefix + "" + device + "." + channel;
+}
 
 function addWidget() {
     widgetnav_open();
@@ -278,6 +287,7 @@ function saveGrid() {
     var nodes = $('.grid-stack > .grid-stack-item:visible');
     var _len = nodes.length;
     var user_grid = [];
+    var theme = document.getElementById("themeCombo").value;
     for (var i = 0; i < _len; i++) {
         var el = $(nodes[i]);
         var node = el.data('_gridstack_node');
@@ -301,7 +311,8 @@ function saveGrid() {
         data: {
             r_type: 'save_grid',
             userID: userID,
-            grid: user_grid
+            grid: user_grid,
+            theme: theme,
         },
         dataType: "text",
         success: function(data, status) {
@@ -321,7 +332,7 @@ function loadGrid() {
         method: "POST",
         data: {
             r_type: 'load_grid',
-            userID: userID
+            userID: userID,
         },
         dataType: "json",
         success: function(data, status) {
@@ -330,6 +341,26 @@ function loadGrid() {
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) {
             console.log("Load grid: error");
+            console.log(XMLHttpRequest);
+        }
+    });
+}
+
+function loadTheme() {
+    $.ajax({
+        url: "back/user_data.php",
+        method: "POST",
+        data: {
+            r_type: 'load_theme',
+            userID: userID,
+        },
+        dataType: "json",
+        success: function(data, status) {
+            console.log("Load theme: " + status);
+            changeTheme(data);
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            console.log("Load theme: error");
             console.log(XMLHttpRequest);
         }
     });
@@ -353,7 +384,7 @@ function loadGraph(widgetID, graphID, data, w, h, x, y) {
     var endDate = todayTime();
     var type = data.type;
     if (type == "line") {
-        loadlineChartData(graphID, data.title,data.equationList, data.xAxis, data.startDate, endDate, data.interval, data.type);
+        loadlineChartData(graphID, data.title, data.devices, data.channels, data.units, data.xAxis, data.startDate, endDate, data.interval, data.type);
         var div = generateChartDiv(graphID);
         addDivtoWidget(div, w, h, x, y, widgetID);
         var l_i = parseInt(graphID.substring(9));
@@ -361,7 +392,7 @@ function loadGraph(widgetID, graphID, data, w, h, x, y) {
             lineChartIndex = l_i + 1;
         }
     } else if (type == "column") {
-        loadBarChartData(graphID, data.title, data.equationList,data.xAxis, data.startDate, endDate, data.accInt, data.tarrifs, data.type);
+        loadBarChartData(graphID, data.title, data.devices, data.channels, data.units,data.xAxis, data.startDate, endDate, data.accInt, data.tarrifs, data.type);
         var div = generateChartDiv(graphID);
         addDivtoWidget(div, w, h, x, y, widgetID);
         var c_i = parseInt(graphID.substring(8));
@@ -369,7 +400,7 @@ function loadGraph(widgetID, graphID, data, w, h, x, y) {
             colChartIndex = c_i + 1;
         }
     } else if (type == "pie") {
-        loadPieChartData(graphID, data.title, data.equationList, data.total, data.startDate, endDate, data.dataType, type);
+        loadPieChartData(graphID, data.title, data.devices, data.total, data.channel, data.units, data.startDate, endDate, data.dataType, type);
         var div = generateChartDiv(graphID);
         addDivtoWidget(div, w, h, x, y, widgetID);
         var p_i = parseInt(graphID.substring(8));
@@ -440,9 +471,15 @@ function addGraph() {
             console.log("No equations selected");
             return;
         }
-        var equationList = [];
+        var channels = [];
+        var devices = [];
+        var units = [];
         for (var i = 0; i < _len; i++) {
-            equationList.push(globalEqList[selEqs[i]]);
+            var equation = globalEqList[selEqs[i]];
+            var channel = equation.number + equation.op + equation.channel;
+            channels.push(channel);
+            devices.push(equation.device);
+            units.push(equation.unit);
         }
 
         var chartID = "linechart" + lineChartIndex;
@@ -452,7 +489,7 @@ function addGraph() {
         var endDate = $("#endDatePicker").val();
         var interval = 1;
         var type = 'line';
-        var data = loadlineChartData(chartID, title, equationList, xAxis, startDate, endDate, interval, type);
+        var data = loadlineChartData(chartID, title, devices, channels, units, xAxis, startDate, endDate, interval, type);
 
         var widgetID = "widget_" + "linechart" + lineChartIndex;
         var div = generateChartDiv("linechart" + lineChartIndex);
@@ -466,9 +503,15 @@ function addGraph() {
             console.log("No equations selected");
             return;
         }
-        var equationList = [];
+        var channels = [];
+        var devices = [];
+        var units = [];
         for (var i = 0; i < _len; i++) {
-            equationList.push(globalEqList[selEqs[i]]);
+            var equation = globalEqList[selEqs[i]];
+            var channel = equation.number + equation.op + equation.channel;
+            channels.push(channel);
+            devices.push(equation.device);
+            units.push(equation.unit);
         }
         var chartID = "colchart" + colChartIndex;
         var title = $("#chartTitleText").val();
@@ -481,7 +524,7 @@ function addGraph() {
             ["0-0-0 00:00", "0-0-0 12:00"]
         ];
 
-        var data = loadBarChartData(chartID, title, equationList, xAxis, startDate, endDate, accInt, tarrifs, type);
+        var data = loadBarChartData(chartID, title, devices, channels, units, xAxis, startDate, endDate, accInt, tarrifs, type);
 
         var div = generateChartDiv("colchart" + colChartIndex);
         var widgetID = "widget_" + "colchart" + colChartIndex + "";
@@ -496,17 +539,23 @@ function addGraph() {
         }
         var chartID = "piechart" + pieChartIndex;
         var title = $("#chartTitleText").val();
-        var equationList = [];
+        var devices = [];
+        var units = [];
         for (var i = 0; i < _len; i++) {
-            equationList.push(globalEqList[selEqs[i]]);
+            var equation = globalEqList[selEqs[i]];
+            devices.push(equation.device);
+            units.push(equation.unit);
         }
         var total = $('#pieChartTotalCombo option:selected').val();
+
+
+        var channel = equation.channel;
         var startDate = $("#startDatePicker").val();
         var endDate = $("#endDatePicker").val();
         var dataType = 'acc';
         var type = 'pie';
 
-        loadPieChartData(chartID, title, equationList, total, startDate, endDate, dataType, type);
+        loadPieChartData(chartID, title, devices, total, channel, units, startDate, endDate, dataType, type);
 
         var div = generateChartDiv("piechart" + pieChartIndex);
         var widgetID = "widget_" + "piechart" + pieChartIndex + "";
@@ -594,6 +643,7 @@ function addGauge(widgetID, graphID, data, w, h, x, y){
 function chageUserEnvironment() {
     loadEquations();
     loadGrid();
+    loadTheme();
 }
 
 function addNote(content) {
@@ -646,11 +696,11 @@ function refreshGraph(chartID,data){
 
     }else{
         if (data.type == "line") {
-            loadlineChartData(chartID, data.title, data.equationList, data.xAxis, data.startDate, data.endDate, data.interval, data.type);
+            loadlineChartData(chartID, data.title, data.devices, data.channels, data.units, data.xAxis, data.startDate, data.endDate, data.interval, data.type);
         } else if (data.type == "column") {
-            loadBarChartData(chartID, data.title, data.equationList, data.xAxis, data.startDate, data.endDate, data.accInt, data.tarrifs, data.type)
+            loadBarChartData(chartID, data.title, data.devices, data.channels, data.units, data.xAxis, data.startDate, data.endDate, data.accInt, data.tarrifs, data.type)
         } else if (data.type == "pie") {
-            loadPieChartData(chartID, data.title, data.equationList, data.total, data.startDate, data.endDate, data.dataType, data.type);
+            loadPieChartData(chartID, data.title, data.devices, data.total, data.channel, data.units, data.startDate, data.endDate, data.dataType, data.type);
         }
     }
     gridSaved = false;
@@ -839,4 +889,78 @@ function showLed(value) {
 
 function imageIsLoaded(e) {
     $('#customerLogo').attr('src', e.target.result);
-};
+}
+
+ function changeTheme(themeId) {
+
+    if (themeId=="dark") {
+        document.getElementById("weatherWidget").src="https://www.meteoblue.com/en/weather/widget/three/colombo_sri-lanka_1248991?geoloc=detect&nocurrent=1&days=4&tempunit=CELSIUS&windunit=KILOMETER_PER_HOUR&layout=dark";
+        loadCSS("css/color-dark.jl.css");
+        loadJS("js/linechart-dark.jl.js");
+        loadJS("js/columnchart-dark.jl.js");
+        loadJS("js/piechart-dark.jl.js");
+        loadGrid();
+    } else {
+        document.getElementById("weatherWidget").src="https://www.meteoblue.com/en/weather/widget/three/colombo_sri-lanka_1248991?geoloc=detect&nocurrent=1&days=4&tempunit=CELSIUS&windunit=KILOMETER_PER_HOUR&layout=bright";
+        loadCSS("css/color-light.jl.css");
+        loadJS("js/linechart-light.jl.js");
+        loadJS("js/columnchart-light.jl.js");
+        loadJS("js/piechart-light.jl.js");
+        loadGrid();
+    }
+}
+
+/** Function to dynamically load JavaScript files */
+function loadJS(file) {
+    var jsElm = document.createElement("script");
+    jsElm.type = "text/javascript";
+    jsElm.src = file;
+    document.body.appendChild(jsElm);
+}
+
+function loadCSS(file) {
+    var cssElm = document.createElement("link");
+    cssElm.rel = "stylesheet";
+    cssElm.type = "text/css";
+    cssElm.href = file;
+    document.body.appendChild(cssElm);
+}
+
+function fullscreen() {
+    var elem = document.documentElement;
+    if (elem.requestFullscreen) {
+    elem.requestFullscreen();
+    } else if (elem.msRequestFullscreen) {
+    elem.msRequestFullscreen();
+    } else if (elem.mozRequestFullScreen) {
+    elem.mozRequestFullScreen();
+    } else if (elem.webkitRequestFullscreen) {
+    elem.webkitRequestFullscreen();
+    }
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement &&    // alternative standard method
+      !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement ) {  // current working methods
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen();
+    } else if (document.documentElement.msRequestFullscreen) {
+      document.documentElement.msRequestFullscreen();
+    } else if (document.documentElement.mozRequestFullScreen) {
+      document.documentElement.mozRequestFullScreen();
+    } else if (document.documentElement.webkitRequestFullscreen) {
+      document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+    }
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
+  }
+}
+;

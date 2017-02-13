@@ -61,12 +61,12 @@ function loadPieChartData(chartID,title,devices,total,channel,units,startDate,en
 
 function initPieChart(chartID,title,chartData,unit){
     var pieChart = new CanvasJS.Chart(chartID, {
-        theme: "theme2",
+        theme: "theme1",
         animationEnabled: false,
-        backgroundColor: "#2A2A2A",
+        backgroundColor: "white",
         title: {
             text: title,
-            fontColor: "lightgray",
+            fontColor: "#0d1a26",
             fontStyle: "normal",
             fontWeight: "lighter",
             fontFamily: "calibri",
@@ -75,7 +75,7 @@ function initPieChart(chartID,title,chartData,unit){
         legend: {
             verticalAlign: "bottom",
             horizontalAlign: "center",
-            fontColor: "lightgray"
+            fontColor: "#333333"
         },
         data: [{
             type: "pie",
